@@ -5,29 +5,41 @@ import { User } from './schemas/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtService } from '@nestjs/jwt';
+
+import * as bcrypt from 'bcrypt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class UsersService {
   private logger = new Logger('UsersService');
 
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
+    console.log(`creating new user with ${JSON.stringify(createUserDto)}`);
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
   }
 
-  async loginUser(loginUserDto: LoginUserDto): Promise<User> {
+  async loginUser(
+    loginUserDto: LoginUserDto,
+  ): Promise<{ accessToken: string }> {
     const { email, password } = loginUserDto;
     const user = await this.userModel.findOne({ email }).exec();
 
     this.logger.debug(`User: ${JSON.stringify(user)}`);
 
-    if (!user || user.password !== password) {
+    if (!user || !(await user.validatePassword(password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return user;
+    const payload: JwtPayload = { username: user.username };
+    const accessToken = this.jwtService.sign(payload);
+    return { accessToken };
   }
 
   async getUser(userId: string): Promise<User> {

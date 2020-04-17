@@ -6,6 +6,7 @@ import {
   UsePipes,
   Get,
   Put,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,7 +27,7 @@ export class UsersController {
   @Post()
   @UsePipes(ValidationPipe)
   async createUser(@Body() createUserDto: CreateUserDto) {
-    // return `createUser: ${JSON.stringify(createUserDto)}`;
+    console.log(`createUser: ${JSON.stringify(createUserDto)}`);
     return this.userService.createUser(createUserDto);
   }
 
@@ -40,6 +41,9 @@ export class UsersController {
   @UsePipes(ValidationPipe)
   async updateUser(@Body() updateUserDto: UpdateUserDto) {
     // return `updateUser: ${JSON.stringify(updateUserDto)}`;
-    return this.userService.updateUser('5e99d5eb62b9d31a56fd1752', updateUserDto);
+    return this.userService.updateUser(
+      '5e99d5eb62b9d31a56fd1752',
+      updateUserDto,
+    );
   }
 }
