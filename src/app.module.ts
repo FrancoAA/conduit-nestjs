@@ -8,9 +8,15 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { ArticlesModule } from './articles/articles.module';
 import { TagsModule } from './tags/tags.module';
 
+import * as config from 'config';
+
+const DbConfig = config.get('db');
+
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/conduit'),
+    MongooseModule.forRoot(
+      `mongodb://${DbConfig.host}:${DbConfig.port}/${DbConfig.database}`,
+    ),
     UsersModule,
     ProfilesModule,
     ArticlesModule,
