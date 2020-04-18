@@ -11,7 +11,7 @@ export const ArticleSchema = new mongoose.Schema({
   createdAt: Date,
   updatedAt: Date,
   favoritedBy: [String],
-  author: String,
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 
 // pre-save hook for the article schema

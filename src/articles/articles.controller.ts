@@ -10,12 +10,17 @@ import {
   Body,
   Put,
   Param,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { GetArticlesFilterDto } from './dto/get-articles-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PostCommentDto } from './dto/post-comment.dto';
 import { ArticlesService } from './articles.service';
+import { GetUser } from 'src/users/get-user.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/users/schemas/user.interface';
 
 @Controller('articles')
 export class ArticlesController {
@@ -27,8 +32,9 @@ export class ArticlesController {
     return this.articleService.getArticles(filters);
   }
 
-  @Get()
-  async getUserFeed() {
+  @Get('/feed')
+  @UseGuards(AuthGuard())
+  async getUserFeed(@GetUser() user: User) {
     return 'getUserFeed';
   }
 
@@ -40,18 +46,22 @@ export class ArticlesController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async createArticle(@Body() createArticleDto: CreateArticleDto) {
-    // return `createArticle: ${JSON.stringify(createArticleDto)}`;
-    return this.articleService.createArticle(createArticleDto);
+  @UseGuards(AuthGuard())
+  async createArticle(
+    @Body() createArticleDto: CreateArticleDto,
+    @GetUser() user: User,
+  ) {
+    return this.articleService.createArticle(createArticleDto, user);
   }
 
   @Put('/:slug')
   async updateArticle(
     @Param('slug') slug: string,
     @Body() updateArticle: UpdateArticleDto,
+    @GetUser() user: User,
   ) {
     // return `updateArticle: ${slug} ${JSON.stringify(updateArticle)}`;
-    return this.articleService.updateArticle(slug, updateArticle);
+    return this.articleService.updateArticle(slug, updateArticle, user);
   }
 
   @Post('/:slug/comments')
