@@ -55,6 +55,7 @@ export class ArticlesController {
   }
 
   @Put('/:slug')
+  @UsePipes(ValidationPipe)
   async updateArticle(
     @Param('slug') slug: string,
     @Body() updateArticle: UpdateArticleDto,
@@ -65,11 +66,15 @@ export class ArticlesController {
   }
 
   @Post('/:slug/comments')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard())
   async postComment(
     @Param('slug') slug: string,
     @Body() postCommentDto: PostCommentDto,
+    @GetUser() user: User,
   ) {
-    return `postComment: ${slug} ${postCommentDto}`;
+    // return `postComment: ${slug} ${postCommentDto}`;
+    return this.articleService.postComment(slug, postCommentDto, user);
   }
 
   @Get('/:slug/comments')

@@ -20,7 +20,6 @@ export class UsersService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    console.log(`creating new user with ${JSON.stringify(createUserDto)}`);
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
   }
@@ -30,8 +29,6 @@ export class UsersService {
   ): Promise<{ accessToken: string }> {
     const { email, password } = loginUserDto;
     const user = await this.userModel.findOne({ email }).exec();
-
-    this.logger.debug(`User: ${JSON.stringify(user)}`);
 
     if (!user || !(await user.validatePassword(password))) {
       throw new UnauthorizedException('Invalid credentials');

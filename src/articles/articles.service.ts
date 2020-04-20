@@ -7,18 +7,22 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Article } from './schemas/article.interface';
+import { ArticleComment } from './schemas/article-comment.interface';
 import { GetArticlesFilterDto } from './dto/get-articles-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { User } from 'src/users/schemas/user.interface';
+import { PostCommentDto } from './dto/post-comment.dto';
 
 @Injectable()
 export class ArticlesService {
   private logger = new Logger('ArticlesService');
 
   constructor(
-    @InjectModel('Article') private readonly articleModel: Model<Article>,
     @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectModel('Article') private readonly articleModel: Model<Article>,
+    @InjectModel('ArticleComment')
+    private readonly articleCommentModel: Model<ArticleComment>,
   ) {}
 
   async createArticle(
@@ -96,5 +100,23 @@ export class ArticlesService {
         runValidators: true,
       },
     );
+  }
+
+  async postComment(slug: string, postCommentDto: PostCommentDto, user: User) {
+    const article = await this.getArticle(slug);
+    if (!article) {
+      throw new NotFoundException(`Article ${slug} not found`);
+    }
+    // creates the new comment with all its info
+    const comment = new this.articleCommentModel(postCommentDto);
+    comment.author = user;
+    await comment.save();
+    // associates the comment with the article
+    await this.articleModel.updateOne(
+      { slug },
+      { $push: { comments: comment._id } },
+    );
+    // returns the newly created comment
+    return comment;
   }
 }
