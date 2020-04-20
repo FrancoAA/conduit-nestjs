@@ -19,8 +19,6 @@ ArticleSchema.pre('save', function(next) {
   // sets updatedAt & createdAt fields
   let now = Date.now();
 
-  console.log('pre save: ', this.title);
-
   this.updatedAt = now;
 
   if (!this.createdAt) {
