@@ -8,6 +8,8 @@ export const UserSchema = new mongoose.Schema({
   salt: String,
   bio: String,
   image: String,
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  favorited: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Article' }],
 });
 
 async function hashPassword(password: string, salt: string): Promise<string> {
@@ -18,7 +20,6 @@ UserSchema.methods.validatePassword = async function(
   password: string,
 ): Promise<boolean> {
   const saltedPassword = await bcrypt.hash(password, this.salt);
-  console.log('saltedPassword: ', saltedPassword, '=', this.password);
   return saltedPassword === this.password;
 };
 

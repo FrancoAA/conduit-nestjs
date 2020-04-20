@@ -97,12 +97,14 @@ export class ArticlesController {
   }
 
   @Post('/:slug/favorite')
-  async favArticle(@Param('slug') slug: string) {
-    return `favArticle ${slug}`;
+  @UseGuards(AuthGuard())
+  async favArticle(@Param('slug') slug: string, @GetUser() user: User) {
+    return this.articleService.favoriteArticle(slug, user);
   }
 
   @Delete('/:slug/favorite')
-  async unfavArticle(@Param('slug') slug: string) {
-    return `unfavArticle ${slug}`;
+  @UseGuards(AuthGuard())
+  async unfavArticle(@Param('slug') slug: string, @GetUser() user: User) {
+    return this.articleService.unfavArticle(slug, user);
   }
 }

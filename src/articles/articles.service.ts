@@ -141,4 +141,30 @@ export class ArticlesService {
       throw new NotFoundException();
     }
   }
+
+  async favoriteArticle(slug: string, user: User) {
+    const article = await this.articleModel.getArticle(slug);
+
+    if (!article) {
+      throw new NotFoundException();
+    }
+
+    return this.userModel.findOneAndUpdate(
+      { _id: user._id },
+      { $push: { favorited: article._id } },
+    );
+  }
+
+  async unfavArticle(slug: string, user: User) {
+    const article = await this.getArticle(slug);
+
+    if (!article) {
+      throw new NotFoundException();
+    }
+
+    return this.userModel.findOneAndUpdate(
+      { _id: user._id },
+      { $pull: { favorited: article._id } },
+    );
+  }
 }
