@@ -17,6 +17,7 @@ import { GetArticlesFilterDto } from './dto/get-articles-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PostCommentDto } from './dto/post-comment.dto';
+import { ParseObjectIdPipe } from '../common/parse-objectid.pipe';
 import { ArticlesService } from './articles.service';
 import { GetUser } from '../users/get-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
@@ -89,7 +90,7 @@ export class ArticlesController {
   @UseGuards(AuthGuard())
   async deleteArticleComment(
     @Param('slug') slug: string,
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @GetUser() user: User,
   ) {
     return this.articleService.deleteComment(slug, id, user);
