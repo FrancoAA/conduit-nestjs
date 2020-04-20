@@ -12,6 +12,7 @@ export const ArticleSchema = new mongoose.Schema({
   updatedAt: Date,
   favoritedBy: [String],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ArticleComment' }],
 });
 
 // pre-save hook for the article schema

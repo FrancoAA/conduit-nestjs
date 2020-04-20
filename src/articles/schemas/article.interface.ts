@@ -10,4 +10,5 @@ export interface Article extends Document {
   readonly updatedAt: Date;
   readonly favoritedBy: [String];
   readonly author: String;
+  readonly comments: [String];
 }
