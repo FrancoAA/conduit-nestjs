@@ -39,10 +39,6 @@ export class UsersService {
     return { accessToken };
   }
 
-  async getUser(userId: string): Promise<User> {
-    return this.userModel.findOne({ _id: userId }).exec();
-  }
-
   async updateUser(
     userId: string,
     updateUserDto: UpdateUserDto,

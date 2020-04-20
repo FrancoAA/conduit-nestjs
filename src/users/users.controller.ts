@@ -7,11 +7,15 @@ import {
   Get,
   Put,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UsersService } from './users.service';
+import { GetUser } from './get-user.decorator';
+import { User } from './schemas/user.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -27,23 +31,23 @@ export class UsersController {
   @Post()
   @UsePipes(ValidationPipe)
   async createUser(@Body() createUserDto: CreateUserDto) {
-    console.log(`createUser: ${JSON.stringify(createUserDto)}`);
     return this.userService.createUser(createUserDto);
   }
 
   @Get()
-  async getCurrentUser() {
-    // return `getCurrentUser`;
-    return this.userService.getUser('5e99d5eb62b9d31a56fd1752');
+  @UseGuards(AuthGuard())
+  async getCurrentUser(@GetUser() user: User): Promise<User> {
+    return user;
   }
 
   @Put()
+  @UseGuards(AuthGuard())
   @UsePipes(ValidationPipe)
-  async updateUser(@Body() updateUserDto: UpdateUserDto) {
+  async updateUser(
+    @Body() updateUserDto: UpdateUserDto,
+    @GetUser() user: User,
+  ) {
     // return `updateUser: ${JSON.stringify(updateUserDto)}`;
-    return this.userService.updateUser(
-      '5e99d5eb62b9d31a56fd1752',
-      updateUserDto,
-    );
+    return this.userService.updateUser(user._id, updateUserDto);
   }
 }
