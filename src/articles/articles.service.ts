@@ -11,7 +11,7 @@ import { ArticleComment } from './schemas/article-comment.interface';
 import { GetArticlesFilterDto } from './dto/get-articles-filter.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
-import { User } from 'src/users/schemas/user.interface';
+import { User } from '../users/schemas/user.interface';
 import { PostCommentDto } from './dto/post-comment.dto';
 
 @Injectable()
@@ -118,5 +118,27 @@ export class ArticlesService {
     );
     // returns the newly created comment
     return comment;
+  }
+
+  async getComments(slug: string) {
+    const articleWithComments = await this.articleModel
+      .findOne({ slug })
+      .populate('comments');
+    return articleWithComments.comments;
+  }
+
+  async deleteComment(slug: string, commentId: string, user: User) {
+    const article = await this.getArticle(slug);
+    article.comments.pull(commentId);
+    await article.save();
+
+    const result = await this.articleCommentModel.deleteOne({
+      _id: commentId,
+      author: user._id,
+    });
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundException();
+    }
   }
 }

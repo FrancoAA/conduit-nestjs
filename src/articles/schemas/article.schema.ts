@@ -1,6 +1,5 @@
 import * as slug from 'slug';
 import * as mongoose from 'mongoose';
-import { ArticlesService } from '../articles.service';
 
 export const ArticleSchema = new mongoose.Schema({
   slug: String,

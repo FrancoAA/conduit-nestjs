@@ -18,9 +18,9 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { PostCommentDto } from './dto/post-comment.dto';
 import { ArticlesService } from './articles.service';
-import { GetUser } from 'src/users/get-user.decorator';
+import { GetUser } from '../users/get-user.decorator';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/users/schemas/user.interface';
+import { User } from '../users/schemas/user.interface';
 
 @Controller('articles')
 export class ArticlesController {
@@ -79,15 +79,20 @@ export class ArticlesController {
 
   @Get('/:slug/comments')
   async getArticleComments(@Param('slug') slug: string) {
-    return `getArticleComments ${slug}`;
+    const response = {
+      comments: await this.articleService.getComments(slug),
+    };
+    return response;
   }
 
   @Delete('/:slug/comments/:id')
+  @UseGuards(AuthGuard())
   async deleteArticleComment(
     @Param('slug') slug: string,
-    @Param('id') id: number,
+    @Param('id') id: string,
+    @GetUser() user: User,
   ) {
-    return `deleteArticleComment ${slug} ${id}`;
+    return this.articleService.deleteComment(slug, id, user);
   }
 
   @Post('/:slug/favorite')

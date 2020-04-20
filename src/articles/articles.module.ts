@@ -3,8 +3,8 @@ import { ArticlesController } from './articles.controller';
 import { ArticlesService } from './articles.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ArticleSchema } from './schemas/article.schema';
-import { UsersModule } from 'src/users/users.module';
-import { UserSchema } from 'src/users/schemas/user.schema';
+import { UsersModule } from '../users/users.module';
+import { UserSchema } from '../users/schemas/user.schema';
 import { ArticleCommentSchema } from './schemas/article-comment.schema';
 
 @Module({
