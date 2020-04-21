@@ -13,6 +13,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { User } from '../users/schemas/user.interface';
 import { PostCommentDto } from './dto/post-comment.dto';
+import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class ArticlesService {
@@ -23,6 +24,7 @@ export class ArticlesService {
     @InjectModel('Article') private readonly articleModel: Model<Article>,
     @InjectModel('ArticleComment')
     private readonly articleCommentModel: Model<ArticleComment>,
+    private readonly tagsService: TagsService,
   ) {}
 
   async createArticle(
@@ -30,8 +32,16 @@ export class ArticlesService {
     user: User,
   ): Promise<Article> {
     const newArticle = new this.articleModel(createArticleDto);
-    this.logger.debug(`createArticle: ${user}`);
+
     newArticle.author = user._id;
+
+    if (newArticle.tagList?.length > 0) {
+      // iterates over the taglist and adds them to the DB
+      for (let tag of newArticle.tagList) {
+        await this.tagsService.addTag(tag);
+      }
+    }
+
     return newArticle.save();
   }
 
