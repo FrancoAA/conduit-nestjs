@@ -104,7 +104,7 @@ export class ArticlesService {
   ) {
     return this.articleModel.findOneAndUpdate(
       { slug, author: user._id },
-      UpdateArticleDto,
+      updatedArticle,
       {
         new: true,
         runValidators: true,
